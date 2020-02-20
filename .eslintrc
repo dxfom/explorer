@@ -1,0 +1,36 @@
+{
+  "root": true,
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "lit"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:lit/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-use-before-define": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
+}

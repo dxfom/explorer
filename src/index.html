@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DXF Explorer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alice">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        flex: none;
+      }
+      * {
+        margin: 0;
+      }
+      html {
+        height: 100%;
+        font-family: system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,"メイリオ",sans-serif;
+      }
+      body {
+        height: 100%;
+        overscroll-behavior: none;
+        display: flex;
+        flex-direction: column;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      textarea, input {
+        font: inherit;
+      }
+      header {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .5em 1em;
+        background-color: #3ab;
+        color: #fff;
+      }
+      h1 {
+        font-family: Alice, serif;
+        font-size: 125%;
+      }
+      nav {
+        flex: none;
+        display: flex;
+        color: #222;
+        background-color: #eee;
+        user-select: none;
+      }
+      nav:not(:empty) {
+        padding: .5em 1em;
+      }
+      nav > label {
+        cursor: pointer;
+        margin: 0 .5em;
+        font-size: 93.75%;
+      }
+      nav > label > input:checked + span {
+        color: #3ab;
+        font-weight: bold;
+        border-bottom: 1px solid;
+      }
+      nav > label > input:not(:checked) + span {
+        color: #999;
+      }
+      nav > label:hover > input + span {
+        color: #3ab;
+      }
+      main {
+        flex: auto;
+        overflow: hidden;
+        font-size: 87.5%;
+        position: relative;
+      }
+      main > section {
+        height: 100%;
+        overflow: auto;
+      }
+      main > section > h3:first-child {
+        margin-top: .5em;
+      }
+      main > section > h3 {
+        padding: 0 1em;
+      }
+      main > section > article {
+        margin: 0 1em 2em 1em;
+      }
+      .dragging-overlay {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 250%;
+      }
+      .dragging > .dragging-overlay {
+        color: white;
+        text-shadow: 0 0 4px;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(2px);
+      }
+      .dragging-overlay::before {
+        content: 'drag dxf file here';
+      }
+      .dragging > .dragging-overlay::before {
+        content: 'drop dxf file here';
+      }
+      :not(.dragging) > main:not(:empty) + .dragging-overlay {
+        opacity: 0;
+        pointer-events: none;
+      }
+      thead > tr:last-child > th {
+        border-bottom: 3px double #ccc;
+      }
+      tbody > tr:nth-child(odd) {
+        background-color: #f4f6f7;
+      }
+      th, td {
+        padding: 0 .5em;
+        border: 1px solid #ccc;
+        white-space: pre;
+      }
+      th:first-child, td:first-child {
+        padding-left: 1em;
+      }
+      th:last-child, td:last-child {
+        padding-right: 1em;
+      }
+      svg {
+        background: #234;
+      }
+      .filter-input-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        padding: 0 1em;
+        background-color: #fff;
+      }
+      input:not([type]) {
+        padding: .25em .5em;
+        border: none;
+        border-bottom: 1px solid #ccc;
+        margin: .5em 0;
+      }
+      .cheetah-grid {
+        box-shadow: 0 0 4px #888;
+      }
+      [tabindex]:not(:focus) > .cheetah-grid {
+        pointer-events: none;
+      }
+
+      /* [tabindex]:not(:focus) .clusterize-scroll  {
+        overflow: hidden;
+      } */
+      .clusterize {
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .clusterize-header-scroll {
+        overflow: hidden;
+      }
+      .clusterize-header-scroll > table {
+        table-layout: fixed;
+        width: max-content;
+      }
+      .clusterize-header-scroll > table > thead > tr > th {
+        overflow: hidden;
+      }
+      .clusterize-scroll {
+        flex: auto;
+        max-height: 100%;
+      }
+      .clusterize-content > tr > td {
+        min-width: 3em;
+      }
+    </style>
+  </head>
+  <body>
+    <header><h1>DXF Explorer</h1></header>
+    <nav></nav>
+    <main></main>
+    <div class="dragging-overlay"></div>
+    <script type="module" src="es2019.js"></script>
+    <script nomodule src="es5.js"></script>
+  </body>
+</html>
