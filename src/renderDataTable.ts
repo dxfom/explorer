@@ -1,7 +1,6 @@
 import 'clusterize.js/clusterize.css'
 import Clusterize from 'clusterize.js'
-
-const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
+import { escapeHtml } from './escapeHtml'
 
 interface Message {
   type: "error" | "info" | "warning";
