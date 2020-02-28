@@ -77,6 +77,7 @@ export default [
     },
     plugins: [
       resolve({ browser: true }),
+      commonjs(),
       babel({
         exclude: [/\/core-js\//],
         presets: [
