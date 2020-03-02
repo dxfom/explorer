@@ -111,8 +111,13 @@ const renderSectionContent = (parentElement: HTMLElement) => {
   }
   const { dxf, activeSectionName } = state
   switch (activeSectionName) {
-    case 'PREVIEW':
-      return parentElement.innerHTML = `<div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${createSvgString(state.dxf)}</div>`
+    case 'PREVIEW': {
+      parentElement.innerHTML = `<div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${createSvgString(state.dxf)}</div>`
+      const svg = parentElement.getElementsByTagName('svg')[0]
+      const bbox = svg.getBBox()
+      svg.setAttribute('viewBox', `${bbox.x - 10} ${bbox.y - 10} ${bbox.width + 20} ${bbox.height + 20}`)
+      return
+    }
     case 'DXF':
       return parentElement.innerHTML = `<textarea readonly style="width: 100%; height: 100%; resize: none;">${createDxfFileString(state.dxf)}</textarea>`
     case 'JSON':
