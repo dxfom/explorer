@@ -58,6 +58,9 @@ export const renderDataTable = <T, C>(
     callbacks: {
       clusterChanged() {
         const bodyRow = tbody.querySelector('tr:not(.clusterize-extra-row)') as HTMLTableRowElement
+        if (bodyRow.classList.contains('clusterize-no-data')) {
+          return
+        }
         for (let i = 0; i < headRow.cells.length; i++) {
           headRow.cells[i].style.width = bodyRow.cells[i].offsetWidth + 'px'
         }
@@ -70,5 +73,4 @@ export const renderDataTable = <T, C>(
     const filteredRows = filteringText ? rows.filter((_, i) => cellContentSelectors.some(([cell]) => cell(records[i])?.toLowerCase().includes(filteringText))) : rows
     clusterize.update(filteredRows)
   })
-  console.log(messageSelector)
 }
