@@ -30,18 +30,35 @@ const groupCodesToDataset = (entity: DxfRecordReadonly) =>
       const value = escapeHtml(String(getGroupCodeValues(entity, key)))
       return value.includes(' ') ? `data-${key}="${value}"` : `data-${key}=${value}`
     })
+    .join(' ')
 
 const mtextAttachmentPointsToSvgAttributeString = [
   '',
-  'dominant-baseline=text-before-edge',
-  'dominant-baseline=text-before-edge text-anchor=middle',
-  'dominant-baseline=text-before-edge text-anchor=end',
-  'dominant-baseline=central',
-  'dominant-baseline=central text-anchor=middle',
-  'dominant-baseline=central text-anchor=end',
-  'dominant-baseline=text-after-edge',
-  'dominant-baseline=text-after-edge text-anchor=middle',
-  'dominant-baseline=text-after-edge text-anchor=end',
+  ' dominant-baseline=text-before-edge',
+  ' dominant-baseline=text-before-edge text-anchor=middle',
+  ' dominant-baseline=text-before-edge text-anchor=end',
+  ' dominant-baseline=central',
+  ' dominant-baseline=central text-anchor=middle',
+  ' dominant-baseline=central text-anchor=end',
+  ' dominant-baseline=text-after-edge',
+  ' dominant-baseline=text-after-edge text-anchor=middle',
+  ' dominant-baseline=text-after-edge text-anchor=end',
+]
+
+const textVerticalAlignmentToSvgAttributeString = [
+  '',
+  ' dominant-baseline=text-after-edge',
+  ' dominant-baseline=central',
+  ' dominant-baseline=text-before-edge',
+]
+
+const textHorizontalAlignmentToSvgAttributeString = [
+  '',
+  '',
+  ' text-anchor=middle',
+  ' text-anchor=end',
+  '',
+  ' text-anchor=middle',
 ]
 
 const entitySvgMap: Record<string, undefined | ((entity: DxfRecordReadonly, vertices: readonly DxfRecordReadonly[]) => string | undefined)> = {
@@ -86,26 +103,30 @@ const entitySvgMap: Record<string, undefined | ((entity: DxfRecordReadonly, vert
     const x = trim(getGroupCodeValue(entity, 10))
     const y = negate(trim(getGroupCodeValue(entity, 20)))
     const h = trim(getGroupCodeValue(entity, 40))
+    const alignH = textHorizontalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 72)) as string & number] ?? ''
+    const alignV = textVerticalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 73)) as string & number] ?? ''
     const contents = parseDxfTextContent(getGroupCodeValue(entity, 1) || '')
+    const attributes = `${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h}${alignH}${alignV}`
     if (contents.length === 1) {
       const content = contents[0]
-      return `<text ${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h}${textDecorations(content)}>${content.text}</text>`
+      return `<text ${attributes}${textDecorations(content)}>${content.text}</text>`
     } else {
-      return `<text ${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h}>${contents.map(content => `<tspan${textDecorations(content)}>${content.text}</tspan>`)}</text>`
+      return `<text ${attributes}>${contents.map(content => `<tspan${textDecorations(content)}>${content.text}</tspan>`)}</text>`
     }
   },
   MTEXT: entity => {
     const x = trim(getGroupCodeValue(entity, 10))
     const y = negate(trim(getGroupCodeValue(entity, 20)))
     const h = trim(getGroupCodeValue(entity, 40))
-    const attachmentPoint = mtextAttachmentPointsToSvgAttributeString[trim(getGroupCodeValue(entity, 71)) as string & number] || ''
+    const attachmentPoint = mtextAttachmentPointsToSvgAttributeString[trim(getGroupCodeValue(entity, 71)) as string & number] ?? ''
     const text = getGroupCodeValues(entity, 3).join('') + (getGroupCodeValue(entity, 1) ?? '')
+    let tspans = text
     try {
-      const contents = parseDxfMTextContent(text)
-      return `<text ${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h} ${attachmentPoint}>${contents}</text>`
+      tspans = String(parseDxfMTextContent(text))
     } catch (error) {
-      return `<text ${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h} ${attachmentPoint}>${text}</text>`
+      console.error(error)
     }
+    return `<text ${groupCodesToDataset(entity)} x=${x} y=${y} font-size=${h}${attachmentPoint}>${tspans}</text>`
   },
 }
 
@@ -144,7 +165,7 @@ const entitiesToSvgString = (dxf: DxfReadonly, entities: DxfReadonly['ENTITIES']
         const xscale = trim(getGroupCodeValue(entity, 41)) || '1'
         const yscale = trim(getGroupCodeValue(entity, 42)) || '1'
         const scale = +xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''
-        s += `<g transform="translate(${x},${y})${scale}">`
+        s += `<g ${groupCodesToDataset(entity)} transform="translate(${x},${y})${scale}">`
         s += entitiesToSvgString(dxf, dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!])
         s += '</g>'
         continue
