@@ -54,7 +54,6 @@ const textVerticalAlignmentToSvgAttributeString = [
 
 const textHorizontalAlignmentToSvgAttributeString = [
   '',
-  '',
   ' text-anchor=middle',
   ' text-anchor=end',
   '',
@@ -62,11 +61,19 @@ const textHorizontalAlignmentToSvgAttributeString = [
 ]
 
 const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((entity: DxfRecordReadonly, vertices: readonly DxfRecordReadonly[]) => string | undefined)> = dxf => {
-  const layerMap: Record<string, undefined | { color: string }> = {}
+  const layerMap: Record<string, undefined | { color: string; ltype?: string }> = {}
   for (const layer of dxf.TABLES?.LAYER ?? []) {
     if (getGroupCodeValue(layer, 0) === 'LAYER') {
       const [h, s, l] = DXF_COLOR_HSL[trim(getGroupCodeValue(layer, 62)) as string & number] ?? [0, 0, 0]
-      layerMap[getGroupCodeValue(layer, 2)!] = { color: `hsl(${h},${s}%,${l * .8}%)` }
+      layerMap[getGroupCodeValue(layer, 2)!] = { color: `hsl(${h},${s}%,${l * .8}%)`, ltype: getGroupCodeValue(layer, 6) }
+    }
+  }
+
+  const ltypeMap: Record<string, undefined | { strokeDasharray: string }> = {}
+  for (const ltype of dxf.TABLES?.LTYPE ?? []) {
+    if (getGroupCodeValue(ltype, 0) === 'LTYPE') {
+      const strokeDasharray = getGroupCodeValues(ltype, 49).map(trim).map(s => s!.startsWith('-') ? s!.slice(1) : s!).join(' ')
+      ltypeMap[getGroupCodeValue(ltype, 2)!] = { strokeDasharray }
     }
   }
 
@@ -95,7 +102,8 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
     if (extrusionZ && Math.abs(extrusionZ + 1) < 1 / 64) {
       style = ' style="transform:rotateY(180deg)"'
     }
-    return `${groupCodesToDataset(entity)}${color(entity, 'stroke')} fill=none vector-effect=non-scaling-stroke${style}`
+    const strokeDasharray = ltypeMap[getGroupCodeValue(entity, 6) ?? layerMap[getGroupCodeValue(entity, 8)!]?.ltype!]?.strokeDasharray
+    return `${groupCodesToDataset(entity)}${color(entity, 'stroke')}${strokeDasharray ? ' stroke-dasharray="' + strokeDasharray + '"' : ''} fill=none vector-effect=non-scaling-stroke${style}`
   }
 
   return {
