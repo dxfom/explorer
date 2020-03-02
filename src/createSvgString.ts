@@ -96,11 +96,13 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
     return ''
   }
 
-  const commonShapeAttributes = (entity: DxfRecordReadonly) => {
+  const commonShapeAttributes = (entity: DxfRecordReadonly, options?: { extrusion: false }) => {
     let style = ''
-    const extrusionZ = +trim(getGroupCodeValue(entity, 230))!
-    if (extrusionZ && Math.abs(extrusionZ + 1) < 1 / 64) {
-      style = ' style="transform:rotateY(180deg)"'
+    if (options?.extrusion !== false) {
+      const extrusionZ = +trim(getGroupCodeValue(entity, 230))!
+      if (extrusionZ && Math.abs(extrusionZ + 1) < 1 / 64) {
+        style = ' style="transform:rotateY(180deg)"'
+      }
     }
     const strokeDasharray = ltypeMap[getGroupCodeValue(entity, 6) ?? layerMap[getGroupCodeValue(entity, 8)!]?.ltype!]?.strokeDasharray
     return `${groupCodesToDataset(entity)}${color(entity, 'stroke')}${strokeDasharray ? ' stroke-dasharray="' + strokeDasharray + '"' : ''} fill=none vector-effect=non-scaling-stroke${style}`
@@ -143,6 +145,18 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         const large = (angle2 - angle1 + PI2) % PI2 <= Math.PI ? '0' : '1'
         return `<path ${commonShapeAttributes(entity)} d="M${x1} ${-y1} A${_r} ${_r} 0 ${large} 0 ${x2} ${-y2}" />`
       }
+    },
+    LEADER: entity => {
+      const xs = getGroupCodeValues(entity, 10).map(trim)
+      const ys = getGroupCodeValues(entity, 20).map(trim)
+      let d = ''
+      for (let i = 0; i < xs.length; i++) {
+        d += d ? 'L' : 'M'
+        d += xs[i]
+        d += ' '
+        d += negate(ys[i])
+      }
+      return `<path ${commonShapeAttributes(entity, { extrusion: false })} d="${d}" />`
     },
     TEXT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
