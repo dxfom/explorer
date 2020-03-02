@@ -32,8 +32,6 @@ const groupCodesToDataset = (entity: DxfRecordReadonly) =>
     })
     .join(' ')
 
-const commonAttributes = (entity: DxfRecordReadonly) => groupCodesToDataset(entity)
-
 const mtextAttachmentPointsToSvgAttributeString = [
   '',
   ' dominant-baseline=text-before-edge',
@@ -63,8 +61,6 @@ const textHorizontalAlignmentToSvgAttributeString = [
   ' text-anchor=middle',
 ]
 
-const commonShapeAttributes = 'fill=none vector-effect=non-scaling-stroke'
-
 const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((entity: DxfRecordReadonly, vertices: readonly DxfRecordReadonly[]) => string | undefined)> = dxf => {
   const layerMap: Record<string, undefined | { color: string }> = {}
   for (const layer of dxf.TABLES?.LAYER ?? []) {
@@ -93,6 +89,15 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
     return ''
   }
 
+  const commonShapeAttributes = (entity: DxfRecordReadonly) => {
+    let style = ''
+    const extrusionZ = +trim(getGroupCodeValue(entity, 230))!
+    if (extrusionZ && Math.abs(extrusionZ + 1) < 1 / 64) {
+      style = ' style="transform:rotateY(180deg)"'
+    }
+    return `${groupCodesToDataset(entity)}${color(entity, 'stroke')} fill=none vector-effect=non-scaling-stroke${style}`
+  }
+
   return {
     LINE: entity => {
       const x1 = trim(getGroupCodeValue(entity, 10))
@@ -100,7 +105,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const x2 = trim(getGroupCodeValue(entity, 11))
       const y2 = negate(trim(getGroupCodeValue(entity, 21)))
       if (isNumberStrings(x1, y1, x2, y2)) {
-        return `<line ${commonAttributes(entity)}${color(entity, 'stroke')} ${commonShapeAttributes} x1=${x1} y1=${y1} x2=${x2} y2=${y2} />`
+        return `<line ${commonShapeAttributes(entity)} x1=${x1} y1=${y1} x2=${x2} y2=${y2} />`
       }
     },
     CIRCLE: entity => {
@@ -108,12 +113,12 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const cy = negate(trim(getGroupCodeValue(entity, 20)))
       const r = trim(getGroupCodeValue(entity, 40))
       if (isNumberStrings(cx, cy, r)) {
-        return `<circle ${commonAttributes(entity)}${color(entity, 'stroke')} ${commonShapeAttributes} cx=${cx} cy=${cy} r=${r} />`
+        return `<circle ${commonShapeAttributes(entity)} cx=${cx} cy=${cy} r=${r} />`
       }
     },
     ARC: entity => {
       const _cx = trim(getGroupCodeValue(entity, 10))
-      const _cy = negate(trim(getGroupCodeValue(entity, 20)))
+      const _cy = trim(getGroupCodeValue(entity, 20))
       const _r = trim(getGroupCodeValue(entity, 40))
       const _angle1 = trim(getGroupCodeValue(entity, 50)) || '0'
       const _angle2 = trim(getGroupCodeValue(entity, 51)) || '0'
@@ -123,12 +128,12 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         const r = +_r!
         const angle1 = +_angle1
         const angle2 = +_angle2
-        const x1 = r * Math.cos(angle1) + cx
-        const y1 = r * Math.sin(angle1) + cy
-        const x2 = r * Math.cos(angle2) + cx
-        const y2 = r * Math.sin(angle2) + cy
+        const x1 = r * Math.cos(angle1 * Math.PI / 180) + cx
+        const y1 = r * Math.sin(angle1 * Math.PI / 180) + cy
+        const x2 = r * Math.cos(angle2 * Math.PI / 180) + cx
+        const y2 = r * Math.sin(angle2 * Math.PI / 180) + cy
         const large = (angle2 - angle1 + PI2) % PI2 <= Math.PI ? '0' : '1'
-        return `<path ${commonAttributes(entity)}${color(entity, 'stroke')} ${commonShapeAttributes} d="M ${x1} ${-y1} A ${_r} ${_r} 0 ${large} 0 ${x2} ${-y2}" />`
+        return `<path ${commonShapeAttributes(entity)} d="M${x1} ${-y1} A${_r} ${_r} 0 ${large} 0 ${x2} ${-y2}" />`
       }
     },
     TEXT: entity => {
@@ -138,7 +143,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const alignH = textHorizontalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 72)) as string & number] ?? ''
       const alignV = textVerticalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 73)) as string & number] ?? ''
       const contents = parseDxfTextContent(getGroupCodeValue(entity, 1) || '')
-      const attributes = `${commonAttributes(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${alignH}${alignV}`
+      const attributes = `${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${alignH}${alignV}`
       if (contents.length === 1) {
         const content = contents[0]
         return `<text ${attributes}${textDecorations(content)}>${content.text}</text>`
@@ -158,7 +163,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       } catch (error) {
         console.error(error)
       }
-      return `<text ${commonAttributes(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${attachmentPoint}>${tspans}</text>`
+      return `<text ${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${attachmentPoint}>${tspans}</text>`
     },
     INSERT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
@@ -167,7 +172,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const yscale = trim(getGroupCodeValue(entity, 42)) || 1
       const scale = +xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''
       const contents = entitiesToSvgString(dxf, dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!])
-      return `<g ${commonAttributes(entity)}${color(entity, 'color')} transform="translate(${x},${y})${scale}">${contents}</g>`
+      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="translate(${x},${y})${scale}">${contents}</g>`
     },
   }
 }
