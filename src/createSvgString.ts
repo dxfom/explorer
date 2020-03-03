@@ -4,7 +4,6 @@ import { parseDxfMTextContent } from '@dxfom/mtext'
 import { DxfTextContentElement, parseDxfTextContent } from '@dxfom/text'
 import { escapeHtml } from './escapeHtml'
 
-const PI2 = Math.PI + Math.PI
 const trim = (s: string | undefined) => s ? s.trim() : s
 const negate = (s: string | undefined) => !s ? s : s.startsWith('-') ? s.slice(1) : '-' + s
 const isNumberString = (s: unknown) => typeof s === 'string' && /^-?[0-9]+(\.[0-9]*)?$/.test(s)
@@ -142,7 +141,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         const y1 = r * Math.sin(angle1 * Math.PI / 180) + cy
         const x2 = r * Math.cos(angle2 * Math.PI / 180) + cx
         const y2 = r * Math.sin(angle2 * Math.PI / 180) + cy
-        const large = (angle2 - angle1 + PI2) % PI2 <= Math.PI ? '0' : '1'
+        const large = (angle2 - angle1 + 360) % 360 <= 180 ? '0' : '1'
         return `<path ${commonShapeAttributes(entity)} d="M${x1} ${-y1} A${_r} ${_r} 0 ${large} 0 ${x2} ${-y2}" />`
       }
     },
