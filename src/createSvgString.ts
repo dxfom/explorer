@@ -200,6 +200,18 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       }
       return `<path ${groupCodesToDataset(entity)}${color(entity, 'fill')} fill-opacity=.3 d="${d}" />`
     },
+    SOLID: entity => {
+      const x1 = trim(getGroupCodeValue(entity, 10))
+      const y1 = negate(trim(getGroupCodeValue(entity, 20)))
+      const x2 = trim(getGroupCodeValue(entity, 11))
+      const y2 = negate(trim(getGroupCodeValue(entity, 21)))
+      const x3 = trim(getGroupCodeValue(entity, 12))
+      const y3 = negate(trim(getGroupCodeValue(entity, 22)))
+      const x4 = trim(getGroupCodeValue(entity, 13))
+      const y4 = negate(trim(getGroupCodeValue(entity, 23)))
+      const d = `M${x1} ${y1}L${x2} ${y2}L${x3} ${y3}${x3 !== x4 || y3 !== y4 ? `L${x4} ${y4}` : ''}Z`
+      return `<path ${groupCodesToDataset(entity)}${color(entity, 'fill')} d="${d}" />`
+    },
     TEXT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
       const y = negate(trim(getGroupCodeValue(entity, 20)))
