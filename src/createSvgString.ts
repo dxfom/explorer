@@ -181,6 +181,25 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       }
       return `<path ${commonShapeAttributes(entity, { extrusion: false })} d="${d}" />`
     },
+    HATCH: entity => {
+      const paths = entity.slice(
+        entity.findIndex(groupCode => groupCode[0] === 92),
+        entity.findIndex(groupCode => groupCode[0] === 97),
+      )
+      const x1s = getGroupCodeValues(paths, 10)
+      const x2s = getGroupCodeValues(paths, 11)
+      const y1s = getGroupCodeValues(paths, 20)
+      const y2s = getGroupCodeValues(paths, 21)
+      let d = ''
+      for (let i = 0; i < x1s.length; i++) {
+        if (x1s[i] === x2s[i - 1] && y1s[i] === y2s[i - 1]) {
+          d += `L${trim(x2s[i])} ${negate(trim(y2s[i]))}`
+        } else {
+          d += `M${trim(x1s[i])} ${negate(trim(y1s[i]))}L${trim(x2s[i])} ${negate(trim(y2s[i]))}`
+        }
+      }
+      return `<path ${groupCodesToDataset(entity)}${color(entity, 'fill')} fill-opacity=.3 d="${d}" />`
+    },
     TEXT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
       const y = negate(trim(getGroupCodeValue(entity, 20)))
@@ -209,13 +228,17 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
     INSERT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
       const y = negate(trim(getGroupCodeValue(entity, 20)))
-      const _rotate = negate(trim(getGroupCodeValue(entity, 50)))
-      const rotate = _rotate ? ` rotate(${_rotate})` : ''
+      const rotate = negate(trim(getGroupCodeValue(entity, 50)))
       const xscale = trim(getGroupCodeValue(entity, 41)) || 1
       const yscale = trim(getGroupCodeValue(entity, 42)) || 1
-      const scale = +xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''
-      const contents = entitiesToSvgString(dxf, dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!])
-      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="translate(${x},${y})${scale}${rotate}">${contents}</g>`
+      const transform = `translate(${x},${y})${+xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''}${rotate ? ` rotate(${rotate})` : ''}`
+      const _block = dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!]
+      const block = _block?.slice(
+        getGroupCodeValue(_block[0], 0) === 'BLOCK' ? 1 : 0,
+        getGroupCodeValue(_block[_block.length - 1], 0) === 'ENDBLK' ? -1 : undefined,
+      )
+      const contents = entitiesToSvgString(dxf, block)
+      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="${transform}">${contents}</g>`
     },
   }
 }
@@ -254,7 +277,12 @@ const entitiesToSvgString = (dxf: DxfReadonly, entities: DxfReadonly['ENTITIES']
       while (getGroupCodeValue(entities[i + 1], 0) === 'VERTEX') {
         vertices.push(entities[++i])
       }
-      s += entitySvgMap[entityType]?.(entity, vertices) ?? ''
+      const entitySvg = entitySvgMap[entityType]
+      if (entitySvg) {
+        s += entitySvg(entity, vertices)
+      } else {
+        console.debug('Unknown entity type:', entityType, entity)
+      }
     }
   }
   return s
