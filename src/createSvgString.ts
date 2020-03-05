@@ -1,6 +1,6 @@
 import { DXF_COLOR_HSL } from '@dxfom/color/hsl'
 import { DxfReadonly, DxfRecordReadonly, getGroupCodeValue, getGroupCodeValues } from '@dxfom/dxf'
-import { parseDxfMTextContent } from '@dxfom/mtext'
+import { DxfMTextContentElement, parseDxfMTextContent } from '@dxfom/mtext'
 import { DxfTextContentElement, parseDxfTextContent } from '@dxfom/text'
 import { escapeHtml } from './escapeHtml'
 
@@ -58,6 +58,30 @@ const textHorizontalAlignmentToSvgAttributeString = [
   '',
   ' text-anchor=middle',
 ]
+
+const tspansFromMTextContents = (contents: readonly DxfMTextContentElement[], i = 0): string => {
+  if (contents.length <= i) {
+    return ''
+  }
+  const restContents = tspansFromMTextContents(contents, i + 1)
+  const content = contents[i]
+  if (typeof content === 'string') {
+    return content + restContents
+  }
+  if (Array.isArray(content)) {
+    return tspansFromMTextContents(content) + restContents
+  }
+  if (content.S) {
+    return `<tspan><tspan dy=-.5em>${content.S[0]}</tspan><tspan dy=.5em>${content.S[2]}</tspan></tspan>` + restContents
+  }
+  if (content.f) {
+    return `<tspan font-family="${content.f}"${content.b ? ' font-weight=bold' : ''}${content.i ? ' font-style=italic' : ''}>${restContents}</tspan>`
+  }
+  if (content.Q) {
+    return `<tspan font-style="oblique ${content.Q}deg">${restContents}</tspan>`
+  }
+  return restContents
+}
 
 const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((entity: DxfRecordReadonly, vertices: readonly DxfRecordReadonly[]) => string | undefined)> = dxf => {
   const layerMap: Record<string, undefined | { color: string; ltype?: string }> = {}
@@ -161,10 +185,11 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const x = trim(getGroupCodeValue(entity, 10))
       const y = negate(trim(getGroupCodeValue(entity, 20)))
       const h = trim(getGroupCodeValue(entity, 40))
+      const angle = negate(trim(getGroupCodeValue(entity, 50)))
       const alignH = textHorizontalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 72)) as string & number] ?? ''
       const alignV = textVerticalAlignmentToSvgAttributeString[trim(getGroupCodeValue(entity, 73)) as string & number] ?? ''
       const contents = parseDxfTextContent(getGroupCodeValue(entity, 1) || '')
-      const attributes = `${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${alignH}${alignV}`
+      const attributes = `${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${alignH}${alignV}${angle ? ` transform="rotate(${angle} ${x} ${y})"` : ''}`
       if (contents.length === 1) {
         const content = contents[0]
         return `<text ${attributes}${textDecorations(content)}>${content.text}</text>`
@@ -178,22 +203,19 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const h = trim(getGroupCodeValue(entity, 40))
       const attachmentPoint = mtextAttachmentPointsToSvgAttributeString[trim(getGroupCodeValue(entity, 71)) as string & number] ?? ''
       const text = getGroupCodeValues(entity, 3).join('') + (getGroupCodeValue(entity, 1) ?? '')
-      let tspans = text
-      try {
-        tspans = String(parseDxfMTextContent(text))
-      } catch (error) {
-        console.error(error)
-      }
+      const tspans = tspansFromMTextContents(parseDxfMTextContent(text))
       return `<text ${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${attachmentPoint}>${tspans}</text>`
     },
     INSERT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
       const y = negate(trim(getGroupCodeValue(entity, 20)))
+      const _rotate = negate(trim(getGroupCodeValue(entity, 50)))
+      const rotate = _rotate ? ` rotate(${_rotate})` : ''
       const xscale = trim(getGroupCodeValue(entity, 41)) || 1
       const yscale = trim(getGroupCodeValue(entity, 42)) || 1
       const scale = +xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''
       const contents = entitiesToSvgString(dxf, dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!])
-      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="translate(${x},${y})${scale}">${contents}</g>`
+      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="translate(${x},${y})${scale}${rotate}">${contents}</g>`
     },
   }
 }
