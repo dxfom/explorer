@@ -245,14 +245,18 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const rotate = negate(trim(getGroupCodeValue(entity, 50)))
       const xscale = trim(getGroupCodeValue(entity, 41)) || 1
       const yscale = trim(getGroupCodeValue(entity, 42)) || 1
-      const transform = `translate(${x},${y})${+xscale !== 1 || +yscale !== 1 ? ` scale(${xscale},${yscale})` : ''}${rotate ? ` rotate(${rotate})` : ''}`
+      const transform = [
+        +x! || +y! ? `translate(${x},${y})` : '',
+        +xscale !== 1 || +yscale !== 1 ? `scale(${xscale},${yscale})` : '',
+        rotate ? `rotate(${rotate})` : ''
+      ].filter(Boolean).join(' ')
       const _block = dxf.BLOCKS?.[getGroupCodeValue(entity, 2)!]
       const block = _block?.slice(
         getGroupCodeValue(_block[0], 0) === 'BLOCK' ? 1 : 0,
         getGroupCodeValue(_block[_block.length - 1], 0) === 'ENDBLK' ? -1 : undefined,
       )
       const contents = entitiesToSvgString(dxf, block)
-      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')} transform="${transform}">${contents}</g>`
+      return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')}${transform ? ` transform="${transform}"` : ''}>${contents}</g>`
     },
   }
 }
