@@ -186,16 +186,18 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         entity.findIndex(groupCode => groupCode[0] === 92),
         entity.findIndex(groupCode => groupCode[0] === 97),
       )
-      const x1s = getGroupCodeValues(paths, 10)
-      const x2s = getGroupCodeValues(paths, 11)
-      const y1s = getGroupCodeValues(paths, 20)
-      const y2s = getGroupCodeValues(paths, 21)
+      const x1s = getGroupCodeValues(paths, 10).map(trim)
+      const y1s = getGroupCodeValues(paths, 20).map(trim).map(negate)
+      const x2s = getGroupCodeValues(paths, 11).map(trim)
+      const y2s = getGroupCodeValues(paths, 21).map(trim).map(negate)
       let d = ''
       for (let i = 0; i < x1s.length; i++) {
-        if (x1s[i] === x2s[i - 1] && y1s[i] === y2s[i - 1]) {
-          d += `L${trim(x2s[i])} ${negate(trim(y2s[i]))}`
+        if (!x2s[i]) {
+          d += `${i === 0 ? 'M' : 'L'}${x1s[i]} ${y1s[i]}`
+        } else if (x1s[i] === x2s[i - 1] && y1s[i] === y2s[i - 1]) {
+          d += `L${x2s[i]} ${y2s[i]}`
         } else {
-          d += `M${trim(x1s[i])} ${negate(trim(y1s[i]))}L${trim(x2s[i])} ${negate(trim(y2s[i]))}`
+          d += `M${x1s[i]} ${y1s[i]}L${x2s[i]} ${y2s[i]}`
         }
       }
       return `<path ${groupCodesToDataset(entity)}${color(entity, 'fill')} fill-opacity=.3 d="${d}" />`
