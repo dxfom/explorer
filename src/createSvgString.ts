@@ -4,6 +4,11 @@ import { DxfMTextContentElement, parseDxfMTextContent } from '@dxfom/mtext'
 import { DxfTextContentElement, parseDxfTextContent } from '@dxfom/text'
 import { escapeHtml } from './escapeHtml'
 
+const _shift = (n: number, precision: number): number => {
+  const [d, e] = ('' + n).split('e')
+  return +(d + 'e' + (e ? +e + precision : precision))
+}
+const round = (n: number, precision: number): number => _shift(Math.round(_shift(n, precision)), -precision)
 const trim = (s: string | undefined) => s ? s.trim() : s
 const negate = (s: string | undefined) => !s ? s : s.startsWith('-') ? s.slice(1) : '-' + s
 const isNumberString = (s: unknown) => typeof s === 'string' && /^-?[0-9]+(\.[0-9]*)?$/.test(s)
@@ -238,6 +243,53 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const text = getGroupCodeValues(entity, 3).join('') + (getGroupCodeValue(entity, 1) ?? '')
       const tspans = tspansFromMTextContents(parseDxfMTextContent(text))
       return `<text ${groupCodesToDataset(entity)}${color(entity, 'fill')} stroke=none x=${x} y=${y} font-size=${h}${attachmentPoint}>${tspans}</text>`
+    },
+    DIMENSION: entity => {
+      const styleName = getGroupCodeValue(entity, 3)
+      const style = dxf.TABLES?.DIMSTYLE?.find(style => getGroupCodeValue(style, 2) === styleName)
+      let lineElements = ''
+      let value = +getGroupCodeValue(entity, 42)!
+      switch (+getGroupCodeValue(entity, 70)! & 7) {
+        case 0: // Rotated, Horizontal, or Vertical
+        case 1: // Aligned
+        {
+          const x1 = trim(getGroupCodeValue(entity, 13))
+          const y1 = negate(trim(getGroupCodeValue(entity, 23)))
+          const x3 = trim(getGroupCodeValue(entity, 10))
+          const y3 = negate(trim(getGroupCodeValue(entity, 20)))
+          const x4 = trim(getGroupCodeValue(entity, 14))
+          const y4 = negate(trim(getGroupCodeValue(entity, 24)))
+          const [x2, y2] = x3 === x4 ? [x1, y3] : [x3, y1]
+          value = value || (Math.abs(x3 === x4 ? +y3! - +y1! : +x3! - +x1!) * +(getGroupCodeValue(style, 144)! || 1))
+          lineElements = `<path vector-effect=non-scaling-stroke d="M${x1} ${y1}L${x2} ${y2}L${x3} ${y3}L${x4} ${y4}" />`
+          break
+        }
+        case 2: // Angular
+        case 5: // Angular 3-point
+          console.warn('Angular dimension cannot be rendered yet.', entity)
+          break
+        case 3: // Diameter
+        case 4: // Radius
+          console.warn('Diameter / radius dimension cannot be rendered yet.', entity)
+          break
+        case 6: // Ordinate
+          console.warn('Ordinate dimension cannot be rendered yet.', entity)
+          break
+      }
+      value = round(value, +getGroupCodeValue(style, 271)! || +getGroupCodeValue(dxf.HEADER?.$DIMDEC, 70)! || 4)
+      let textElement: string
+      {
+        const x = trim(getGroupCodeValue(entity, 11))
+        const y = negate(trim(getGroupCodeValue(entity, 21)))
+        const h = +getGroupCodeValue(style, 140)! * (+getGroupCodeValue(style, 40)! || +getGroupCodeValue(dxf.HEADER?.$DIMSCALE, 40)! || 1)
+        const angle = negate(trim(getGroupCodeValue(entity, 50)))
+        const attachmentPoint = mtextAttachmentPointsToSvgAttributeString[trim(getGroupCodeValue(entity, 71)) as string & number] ?? ''
+        const textOriginal = getGroupCodeValue(entity, 1) ?? '<>'
+        const text = parseDxfTextContent(textOriginal.replace(/<>/, value as string & number)).map(({ text }) => text).join('')
+        const tspans = tspansFromMTextContents(parseDxfMTextContent(text))
+        textElement = `<text${color(entity, 'fill')}${attachmentPoint} stroke=none x=${x} y=${y} font-size=${h}${angle ? ` transform="rotate(${angle} ${x} ${y})"` : ''}>${tspans}</text>`
+      }
+      return `<g ${commonShapeAttributes(entity)}${color(entity, 'stroke')}>${lineElements}${textElement}</g>`
     },
     INSERT: entity => {
       const x = trim(getGroupCodeValue(entity, 10))
