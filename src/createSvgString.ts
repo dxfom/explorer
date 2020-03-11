@@ -281,7 +281,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       {
         const x = trim(getGroupCodeValue(entity, 11))
         const y = negate(trim(getGroupCodeValue(entity, 21)))
-        const h = +getGroupCodeValue(style, 140)! * (+getGroupCodeValue(style, 40)! || +getGroupCodeValue(dxf.HEADER?.$DIMSCALE, 40)! || 1)
+        const h = (+getGroupCodeValue(style, 140)! || +getGroupCodeValue(dxf.HEADER?.$DIMTXT, 40)!) * (+getGroupCodeValue(style, 40)! || +getGroupCodeValue(dxf.HEADER?.$DIMSCALE, 40)! || 1)
         const angle = negate(trim(getGroupCodeValue(entity, 50)))
         const attachmentPoint = mtextAttachmentPointsToSvgAttributeString[trim(getGroupCodeValue(entity, 71)) as string & number] ?? ''
         const textOriginal = getGroupCodeValue(entity, 1) ?? '<>'
