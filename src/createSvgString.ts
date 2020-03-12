@@ -336,8 +336,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         const y = $negate(entity, 21)
         const h = (+$(style, 140)! || +$(dxf.HEADER?.$DIMTXT, 40)!) * (+$(style, 40)! || +$(dxf.HEADER?.$DIMSCALE, 40)! || 1)
         const angle = $negate(entity, 50)
-        const textOriginal = $(entity, 1) ?? '<>'
-        const text = parseDxfTextContent(textOriginal.replace(/<>/, value as string & number)).map(({ text }) => text).join('')
+        const text = $(entity, 1)?.replace(/<>/, value as string & number) ?? String(value)
         const tspans = tspansFromMTextContents(parseDxfMTextContent(text))
         textElement = `<text${color(entity, 'fill')} dominant-baseline=text-after-edge text-anchor=middle stroke=none x=${x} y=${y} font-size=${h}${angle ? ` transform="rotate(${angle} ${x} ${y})"` : ''}>${tspans}</text>`
       }
