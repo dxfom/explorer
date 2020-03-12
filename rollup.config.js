@@ -36,7 +36,7 @@ export default [
     plugins: [
       !watching && analyze({ summaryOnly: true, filter: module => module.size !== 0 }),
       !watching && filesize({ showBrotliSize: true }),
-      copy({ targets: [{ src: 'src/index.html', dest: 'docs/' }] }),
+      copy({ targets: [{ src: ['src/index.html', 'src/favicon.png'], dest: 'docs/' }] }),
       resolve({ browser: true }),
       commonjs(),
       alias({ entries: { 'cheetah-grid': 'cheetah-grid/dist/cheetahGrid.js' } }),
