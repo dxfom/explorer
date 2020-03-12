@@ -4,6 +4,10 @@ import { DxfMTextContentElement, parseDxfMTextContent } from '@dxfom/mtext'
 import { DxfTextContentElement, parseDxfTextContent } from '@dxfom/text'
 import { escapeHtml } from './escapeHtml'
 
+const resolveColorIndex = (index: number | string | undefined) => {
+  const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50]
+  return `hsl(${h},${s}%,${l * .8 + 20}%)`
+}
 const smallNumber = 1 / 64
 const nearlyEqual = (a: number, b: number) => Math.abs(a - b) < smallNumber
 const round = (() => {
@@ -113,8 +117,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
   const layerMap: Record<string, undefined | { color: string; ltype?: string }> = {}
   for (const layer of dxf.TABLES?.LAYER ?? []) {
     if ($(layer, 0) === 'LAYER') {
-      const [h, s, l] = DXF_COLOR_HSL[$trim(layer, 62) as string & number] ?? [0, 0, 0]
-      layerMap[$(layer, 2)!] = { color: `hsl(${h},${s}%,${l * .8}%)`, ltype: $(layer, 6) }
+      layerMap[$(layer, 2)!] = { color: resolveColorIndex($trim(layer, 62)), ltype: $(layer, 6) }
     }
   }
 
@@ -133,8 +136,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       return ` ${attributeName}=currentColor`
     }
     if (colorIndex && colorIndex !== '256') {
-      const [h, s, l] = DXF_COLOR_HSL[colorIndex] ?? [0, 0, 0]
-      return ` ${attributeName}=hsl(${h},${s}%,${l * .8}%)`
+      return ` ${attributeName}=${resolveColorIndex(colorIndex)}`
     }
     const layer = layerMap[$trim(entity, 8)!]
     if (layer) {
