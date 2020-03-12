@@ -146,6 +146,20 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         return `<line ${commonShapeAttributes(entity)} x1=${x1} y1=${y1} x2=${x2} y2=${y2} />`
       }
     },
+    POLYLINE: (entity, vertices) => {
+      const flags = +(getGroupCodeValue(entity, 70) ?? 0)
+      let d = ''
+      for (const vertex of vertices) {
+        d += d ? 'L' : 'M'
+        d += trim(getGroupCodeValue(vertex, 10))
+        d += ' '
+        d += negate(trim(getGroupCodeValue(vertex, 20)))
+      }
+      if (flags & 1) {
+        d += 'Z'
+      }
+      return `<path ${commonShapeAttributes(entity)} d="${d}" />`
+    },
     CIRCLE: entity => {
       const cx = trim(getGroupCodeValue(entity, 10))
       const cy = negate(trim(getGroupCodeValue(entity, 20)))
@@ -266,14 +280,14 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
         }
         case 2: // Angular
         case 5: // Angular 3-point
-          console.warn('Angular dimension cannot be rendered yet.', entity)
+          console.debug('Angular dimension cannot be rendered yet.', entity)
           break
         case 3: // Diameter
         case 4: // Radius
-          console.warn('Diameter / radius dimension cannot be rendered yet.', entity)
+          console.debug('Diameter / radius dimension cannot be rendered yet.', entity)
           break
         case 6: // Ordinate
-          console.warn('Ordinate dimension cannot be rendered yet.', entity)
+          console.debug('Ordinate dimension cannot be rendered yet.', entity)
           break
       }
       value = round(value, +getGroupCodeValue(style, 271)! || +getGroupCodeValue(dxf.HEADER?.$DIMDEC, 70)! || 4)
@@ -310,6 +324,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const contents = entitiesToSvgString(dxf, block)
       return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')}${transform ? ` transform="${transform}"` : ''}>${contents}</g>`
     },
+    SEQEND: () => '',
   }
 }
 

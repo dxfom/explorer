@@ -10,7 +10,7 @@ onDragDrop(document.body, file => {
       console.error(file.name, (completedAt - startedAt) + ' [ms]', error)
       alert('エラーが発生しました。')
     } else {
-      console.log(file.name, (completedAt - startedAt) + ' [ms]')
+      console.debug(file.name, (completedAt - startedAt) + ' [ms]')
       render({ filename: file.name, dxf: dxf || {}, activeSectionName: 'PREVIEW' })
     }
   })
