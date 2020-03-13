@@ -10,6 +10,7 @@
       *, *::before, *::after {
         box-sizing: border-box;
         flex: none;
+        overscroll-behavior: contain;
       }
       * {
         margin: 0;
@@ -153,16 +154,7 @@
         border-bottom: 1px solid #ccc;
         margin: .5em 0;
       }
-      .cheetah-grid {
-        box-shadow: 0 0 4px #888;
-      }
-      [tabindex]:not(:focus) > .cheetah-grid {
-        pointer-events: none;
-      }
 
-      /* [tabindex]:not(:focus) .clusterize-scroll  {
-        overflow: hidden;
-      } */
       .clusterize {
         max-height: 100%;
         display: flex;

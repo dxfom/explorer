@@ -1,6 +1,5 @@
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import alias from '@rollup/plugin-alias'
 import typescript from '@rollup/plugin-typescript'
 import copy from 'rollup-plugin-copy'
 import { eslint } from 'rollup-plugin-eslint'
@@ -39,7 +38,6 @@ export default [
       copy({ targets: [{ src: ['src/index.html', 'src/favicon.png'], dest: 'docs/' }] }),
       resolve({ browser: true }),
       commonjs(),
-      alias({ entries: { 'cheetah-grid': 'cheetah-grid/dist/cheetahGrid.js' } }),
       eslint({ include: ['src/**/*.ts'] }),
       typecheck(),
       babel({
