@@ -184,6 +184,22 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       }
       return `<path ${commonShapeAttributes(entity)} d="${d}" />`
     },
+    LWPOLYLINE: entity => {
+      const flags = +($(entity, 70) ?? 0)
+      const xs = $$(entity, 10)
+      const ys = $$(entity, 20)
+      let d = ''
+      for (let i = 0; i < xs.length; i++) {
+        d += d ? 'L' : 'M'
+        d += trim(xs[i])
+        d += ' '
+        d += negate(trim(ys[i]))
+      }
+      if (flags & 1) {
+        d += 'Z'
+      }
+      return `<path ${commonShapeAttributes(entity)} d="${d}" />`
+    },
     CIRCLE: entity => {
       const cx = $trim(entity, 10)
       const cy = $negate(entity, 20)
