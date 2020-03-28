@@ -112,10 +112,22 @@ const renderSectionContent = (parentElement: HTMLElement) => {
   const { dxf, activeSectionName } = state
   switch (activeSectionName) {
     case 'PREVIEW': {
-      parentElement.innerHTML = `<div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${createSvgString(state.dxf)}</div>`
+      parentElement.innerHTML = `
+        <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">
+          ${createSvgString(state.dxf)}
+        </div>
+        <div style="position: absolute; right: 16px; bottom: 8px; text-align: right; color: #ddd; text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123;"></div>
+      `
+      const coordinateElement = parentElement.lastElementChild!
       const svg = parentElement.getElementsByTagName('svg')[0]
       const bbox = svg.getBBox()
       svg.setAttribute('viewBox', `${bbox.x - 10} ${bbox.y - 10} ${bbox.width + 20} ${bbox.height + 20}`)
+      svg.onpointermove = ({ currentTarget, clientX, clientY }) => {
+        const svg = currentTarget as SVGSVGElement
+        const { x, y } = Object.assign(svg.createSVGPoint(), { x: clientX, y: clientY }).matrixTransform(svg.getScreenCTM()!.inverse())
+        coordinateElement.textContent = `${Math.round(x)}, ${Math.round(y)}`
+      }
+      svg.onpointerleave = () => coordinateElement.textContent = ''
       return
     }
     case 'DXF':
