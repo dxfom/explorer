@@ -360,6 +360,45 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       }
       return `<g ${commonShapeAttributes(entity)}${color(entity, 'stroke')}>${lineElements}${textElement}</g>`
     },
+    ACAD_TABLE: entity => {
+      const cells: DxfRecordReadonly[] = []
+      {
+        let index = entity.findIndex(groupCode => groupCode[0] === 171)
+        for (let i = index + 1; i < entity.length; i++) {
+          if (entity[i][0] === 171) {
+            cells.push(entity.slice(index, i))
+            index = i
+          }
+        }
+        cells.push(entity.slice(index, entity.length))
+      }
+      const ys = $$(entity, 141).map(s => +s).reduce((ys, size) => (ys.push(ys[ys.length - 1] + size), ys), [0])
+      const xs = $$(entity, 142).map(s => +s).reduce((xs, size) => (xs.push(xs[xs.length - 1] + size), xs), [0])
+      const lineColor = color(entity, 'stroke')
+      const textColor = resolveColorIndex($trim(entity, 64))
+      let s = ys.map(y => `<line${lineColor} x1=0 y1=${y} x2=${xs[xs.length - 1]} y2=${y} vector-effect=non-scaling-stroke />`).join('')
+      let xi = 0
+      let yi = 0
+      for (const cell of cells) {
+        const x = xs[xi]
+        const y = ys[yi]
+        const color = $(cell, 64)
+        if (!+$(cell, 173)!) {
+          s += `<line${lineColor} x1=${x} y1=${y} x2=${x} y2=${ys[yi + 1]} vector-effect=non-scaling-stroke />`
+        }
+        if ($trim(cell, 171) === '2') {
+          console.debug('Table cell type "block" cannot be rendered yet.', entity, cell)
+        } else {
+          s += `<text x=${x} y=${y} fill=${color ? resolveColorIndex(color) : textColor} white-space=pre>${tspansFromMTextContents(parseDxfMTextContent($(cell, 1) ?? ''))}</text>`
+        }
+        if (++xi === xs.length - 1) {
+          xi = 0
+          yi++
+        }
+      }
+      s += `<line${lineColor} x1=${xs[xs.length - 1]} y1=0 x2=${xs[xs.length - 1]} y2=${ys[ys.length - 1]} vector-effect=non-scaling-stroke />`
+      return `<g font-size=${$trim(entity, 140)} dominant-baseline=text-before-edge transform="translate(${$trim(entity, 10)},${$negate(entity, 20)})">${s}</g>`
+    },
     INSERT: entity => {
       const x = $trim(entity, 10)
       const y = $negate(entity, 20)
