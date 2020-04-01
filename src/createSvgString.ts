@@ -161,6 +161,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
   }
 
   return {
+    POINT: () => '',
     LINE: entity => {
       const x1 = $trim(entity, 10)
       const y1 = $negate(entity, 20)
@@ -418,7 +419,6 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       const contents = entitiesToSvgString(dxf, block)
       return `<g ${groupCodesToDataset(entity)}${color(entity, 'color')}${transform ? ` transform="${transform}"` : ''}>${contents}</g>`
     },
-    SEQEND: () => '',
   }
 }
 
@@ -455,6 +455,9 @@ const entitiesToSvgString = (dxf: DxfReadonly, entities: DxfReadonly['ENTITIES']
       const vertices: NonNullable<DxfReadonly['ENTITIES']>[0][] = []
       while ($(entities[i + 1], 0) === 'VERTEX') {
         vertices.push(entities[++i])
+      }
+      if (vertices.length !== 0 && $(entities[i + 1], 0) === 'SEQEND') {
+        i++
       }
       const entitySvg = entitySvgMap[entityType]
       if (entitySvg) {
