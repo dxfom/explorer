@@ -125,7 +125,7 @@ const renderSectionContent = (parentElement: HTMLElement) => {
       svg.onpointermove = ({ currentTarget, clientX, clientY }) => {
         const svg = currentTarget as SVGSVGElement
         const { x, y } = Object.assign(svg.createSVGPoint(), { x: clientX, y: clientY }).matrixTransform(svg.getScreenCTM()!.inverse())
-        coordinateElement.textContent = `${Math.round(x)}, ${Math.round(y)}`
+        coordinateElement.textContent = `${Math.round(x)}, ${Math.round(-y)}`
       }
       svg.onpointerleave = () => coordinateElement.textContent = ''
       return
