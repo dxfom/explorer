@@ -3,8 +3,8 @@ import Clusterize from 'clusterize.js'
 import { escapeHtml } from './escapeHtml'
 
 interface Message {
-  type: "error" | "info" | "warning";
-  message: string | null;
+  type: "error" | "info" | "warning"
+  message: string | null
 }
 
 export const renderDataTable = <T, C>(
