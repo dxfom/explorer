@@ -17,8 +17,6 @@ const round = (() => {
   }
   return (n: number, precision: number) => _shift(Math.round(_shift(n, precision)), -precision)
 })()
-const isNumberString = (s: unknown) => typeof s === 'string' && /^-?[0-9]+(\.[0-9]*)?$/.test(s)
-const isNumberStrings = (...ss: readonly unknown[]) => ss.every(isNumberString)
 
 const trim = (s: string | undefined) => s ? s.trim() : s
 const negate = (s: string | undefined) => !s ? s : s.startsWith('-') ? s.slice(1) : '-' + s
@@ -162,15 +160,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
 
   return {
     POINT: () => '',
-    LINE: entity => {
-      const x1 = $trim(entity, 10)
-      const y1 = $negate(entity, 20)
-      const x2 = $trim(entity, 11)
-      const y2 = $negate(entity, 21)
-      if (isNumberStrings(x1, y1, x2, y2)) {
-        return `<line ${commonShapeAttributes(entity)} x1=${x1} y1=${y1} x2=${x2} y2=${y2} />`
-      }
-    },
+    LINE: entity => `<line ${commonShapeAttributes(entity)} x1=${$trim(entity, 10)} y1=${$negate(entity, 20)} x2=${$trim(entity, 11)} y2=${$negate(entity, 21)} />`,
     POLYLINE: (entity, vertices) => {
       const flags = +($(entity, 70) ?? 0)
       let d = ''
@@ -201,14 +191,7 @@ const createEntitySvgMap: (dxf: DxfReadonly) => Record<string, undefined | ((ent
       }
       return `<path ${commonShapeAttributes(entity)} d="${d}" />`
     },
-    CIRCLE: entity => {
-      const cx = $trim(entity, 10)
-      const cy = $negate(entity, 20)
-      const r = $trim(entity, 40)
-      if (isNumberStrings(cx, cy, r)) {
-        return `<circle ${commonShapeAttributes(entity)} cx=${cx} cy=${cy} r=${r} />`
-      }
-    },
+    CIRCLE: entity => `<circle ${commonShapeAttributes(entity)} cx=${$trim(entity, 10)} cy=${$negate(entity, 20)} r=${$trim(entity, 40)} />`,
     ARC: entity => {
       const cx = $number(entity, 10)
       const cy = $number(entity, 20)
