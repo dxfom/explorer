@@ -11,7 +11,10 @@ export const onDragDrop = (element: HTMLElement, listener: (file: File) => unkno
     dragEnter = false
     const dataTransfer = event.dataTransfer
     if (dataTransfer) {
-      if (dataTransfer.types.length === 1 && dataTransfer.types[0] === 'Files') {
+      if (
+        (dataTransfer.types.length === 1 && dataTransfer.types[0] === 'Files') || 
+        (dataTransfer.items && dataTransfer.items.length === 1 && dataTransfer.items[0].kind === 'file')
+      ) {
         dataTransfer.dropEffect = 'copy'
       } else {
         dataTransfer.dropEffect = 'none'
