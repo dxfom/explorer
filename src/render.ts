@@ -1,10 +1,11 @@
 /* eslint @typescript-eslint/camelcase: ["error", { allow: ["^WIP_"] }] */
+import { DXF_COLOR_HSL } from '@dxfom/color/hsl'
 import { createDxfFileString, Dxf, DxfRecordReadonly, getGroupCodeValue, getGroupCodeValues } from '@dxfom/dxf'
+import { createSvgString } from '@dxfom/svg'
 import { parseDxfTextContent } from '@dxfom/text'
 import { html, render as _render } from 'lit-html'
 import { repeat } from 'lit-html/directives/repeat'
 import 'svg-pan-zoom-container'
-import { createSvgString } from './createSvgString'
 import { renderDataTable } from './renderDataTable'
 
 const identity = <T>(x: T) => x
@@ -104,6 +105,11 @@ const renderHeaderOrClassesSectionContent = (
   }
 }
 
+const resolveColorIndex = (index: number | string | undefined) => {
+  const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50]
+  return `hsl(${h},${s}%,${l * .8 + 20}%)`
+}
+
 const renderSectionContent = (parentElement: HTMLElement) => {
   parentElement.innerHTML = ''
   if (!state.activeSectionName) {
@@ -112,11 +118,11 @@ const renderSectionContent = (parentElement: HTMLElement) => {
   const { dxf, activeSectionName } = state
   switch (activeSectionName) {
     case 'PREVIEW': {
+      const svgString = createSvgString(state.dxf, { resolveColorIndex })
       parentElement.innerHTML = `
-        <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">
-          ${createSvgString(state.dxf)}
-        </div>
-        <div style="position: absolute; right: 16px; bottom: 8px; text-align: right; color: #ddd; text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123;"></div>
+        <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${svgString}</div>
+        <a target=_blank href="data:image/svg+xml,${encodeURIComponent(svgString)}" style="position: absolute; right: 16px; top: 8px">SVG File</a>
+        <div style="pointer-events: none; position: absolute; right: 16px; bottom: 8px; text-align: right; color: #ddd; text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123"></div>
       `
       const coordinateElement = parentElement.lastElementChild!
       const svg = parentElement.getElementsByTagName('svg')[0]

@@ -39,6 +39,7 @@
     "@dxfom/color": "github:dxfom/color",
     "@dxfom/dxf": "github:dxfom/dxf",
     "@dxfom/mtext": "github:dxfom/mtext",
+    "@dxfom/svg": "github:dxfom/svg",
     "@dxfom/text": "github:dxfom/text",
     "clusterize.js": "^0.18.1",
     "svg-pan-zoom-container": "^0.2.7"
