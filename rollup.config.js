@@ -59,7 +59,7 @@ export default [
             },
           ],
         ],
-        extensions: ['.ts'],
+        extensions: ['.ts', '.mjs'],
       }),
       postcss({ extensions: ['.css'], extract: 'docs/styles.css', minimize: true }),
       production && terser({ warnings: true, compress: { passes: 3 }, output: { comments: false } }),
