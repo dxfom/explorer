@@ -36,11 +36,11 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@dxfom/color": "github:dxfom/color",
+    "@dxfom/color": "^0.1.1",
     "@dxfom/dxf": "github:dxfom/dxf",
-    "@dxfom/mtext": "github:dxfom/mtext",
+    "@dxfom/mtext": "^0.1.0",
     "@dxfom/svg": "github:dxfom/svg",
-    "@dxfom/text": "github:dxfom/text",
+    "@dxfom/text": "^0.1.0",
     "clusterize.js": "^0.18.1",
     "svg-pan-zoom-container": "^0.2.7"
   }
