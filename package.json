@@ -2,6 +2,7 @@
   "name": "@dxfom/explorer",
   "version": "0.0.0",
   "private": true,
+  "license": "GPL-3.0",
   "scripts": {
     "build": "rimraf docs/ && rollup -c --environment NODE_ENV:production",
     "start": "rollup -c -w"
