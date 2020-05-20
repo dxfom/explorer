@@ -61,7 +61,7 @@ export default [
         ],
         extensions: ['.ts', '.mjs'],
       }),
-      postcss({ extensions: ['.css'], extract: 'docs/styles.css', minimize: true }),
+      postcss({ extensions: ['.css'], extract: 'styles.css', minimize: true }),
       production && terser({ warnings: true, compress: { passes: 3 }, output: { comments: false } }),
       watching && serve({ contentBase: 'docs/', open: true }),
     ],
