@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/camelcase: ["error", { allow: ["^WIP_"] }] */
 import { DXF_COLOR_HSL } from '@dxfom/color/hsl'
 import { createDxfFileString, DxfReadonly } from '@dxfom/dxf'
 import { createSvgString } from '@dxfom/svg'

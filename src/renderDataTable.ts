@@ -7,7 +7,7 @@ interface Message {
   message: string | null
 }
 
-export const renderDataTable = <T, C>(
+export const renderDataTable = <T, C extends string | number>(
   parentElement: HTMLElement,
   filterInputElement: HTMLInputElement,
   columns: readonly C[],
@@ -34,7 +34,7 @@ export const renderDataTable = <T, C>(
 
   const headRow = parentElement.getElementsByTagName('thead')[0].insertRow()
   for (const column of columns) {
-    headRow.appendChild(document.createElement('th')).textContent = column as any
+    headRow.appendChild(document.createElement('th')).textContent = column as string
   }
 
   const tbody = parentElement.getElementsByTagName('tbody')[0]
@@ -62,7 +62,7 @@ export const renderDataTable = <T, C>(
           return
         }
         for (let i = 0; i < headRow.cells.length; i++) {
-          headRow.cells[i].style.width = bodyRow.cells[i].offsetWidth + 'px'
+          headRow.cells[i].style.width = `${bodyRow.cells[i].offsetWidth}px`
         }
       },
     },
