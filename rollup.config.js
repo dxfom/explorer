@@ -1,8 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import typescript from '@rollup/plugin-typescript'
 import copy from 'rollup-plugin-copy'
-import { eslint } from 'rollup-plugin-eslint'
 import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
 import filesize from 'rollup-plugin-filesize'
@@ -12,17 +10,6 @@ import serve from 'rollup-plugin-serve'
 
 const production = process.env.NODE_ENV === 'production'
 const watching = process.env.ROLLUP_WATCH
-
-const typecheck = () => {
-  const originalPlugin = typescript()
-  const transform = originalPlugin.transform
-  return Object.assign(originalPlugin, {
-    transform(...args) {
-      transform.apply(this, args)
-      // ignore result
-    }
-  })
-}
 
 export default [
   {
@@ -36,16 +23,11 @@ export default [
       !watching && analyze({ summaryOnly: true, filter: module => module.size !== 0 }),
       !watching && filesize({ showBrotliSize: true }),
       copy({ targets: [{ src: ['src/index.html', 'src/favicon.png'], dest: 'docs/' }] }),
-      resolve({ browser: true }),
+      resolve({ browser: true, extensions: ['.mjs', '.js', '.ts'] }),
       commonjs(),
-      eslint({ include: ['src/**/*.ts'] }),
-      typecheck(),
       babel({
         presets: ['@babel/preset-typescript'],
         plugins: [
-          '@babel/plugin-proposal-optional-chaining',
-          '@babel/plugin-proposal-nullish-coalescing-operator',
-          '@babel/plugin-proposal-class-properties',
           [
             'babel-plugin-template-html-minifier',
             {
