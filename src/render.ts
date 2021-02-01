@@ -6,6 +6,8 @@ import { repeat } from 'lit-html/directives/repeat'
 import 'svg-pan-zoom-container'
 import { renderSectionContent } from './renderSectionContent'
 
+const textDecoder = new TextDecoder('ms932')
+
 let state = {
   filename: '',
   dxf: {} as DxfReadonly,
@@ -57,7 +59,7 @@ const renderTabContent = (parentElement: HTMLElement) => {
   const { dxf, activeSectionName } = state
   switch (activeSectionName) {
     case 'PREVIEW': {
-      const svgString = createSvgString(state.dxf, { resolveColorIndex })
+      const svgString = createSvgString(state.dxf, { resolveColorIndex, encoding: textDecoder })
       parentElement.innerHTML = `
         <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${svgString}</div>
         <a target=_blank href="data:image/svg+xml,${encodeURIComponent(svgString)}" style="position: absolute; right: 16px; top: 8px">SVG File</a>
