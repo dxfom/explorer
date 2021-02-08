@@ -1,6 +1,6 @@
 import { DXF_COLOR_HSL } from '@dxfom/color/hsl'
 import { createDxfFileString, DxfReadonly } from '@dxfom/dxf'
-import { createSvgString } from '@dxfom/svg'
+import { createSvgString, DxfFont } from '@dxfom/svg'
 import { html, render as _render } from 'lit-html'
 import { repeat } from 'lit-html/directives/repeat'
 import 'svg-pan-zoom-container'
@@ -50,6 +50,7 @@ const resolveColorIndex = (index: number | string | undefined) => {
   const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50]
   return `hsl(${h},${s}%,${l * .8 + 20}%)`
 }
+const resolveFont = (font: DxfFont) => ({ ...font, family: font.family + ',var(--font-family)' })
 
 const renderTabContent = (parentElement: HTMLElement) => {
   parentElement.innerHTML = ''
@@ -59,7 +60,7 @@ const renderTabContent = (parentElement: HTMLElement) => {
   const { dxf, activeSectionName } = state
   switch (activeSectionName) {
     case 'PREVIEW': {
-      const svgString = createSvgString(state.dxf, { resolveColorIndex, encoding: textDecoder })
+      const svgString = createSvgString(state.dxf, { resolveColorIndex, resolveFont, encoding: textDecoder })
       parentElement.innerHTML = `
         <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${svgString}</div>
         <a target=_blank href="data:image/svg+xml,${encodeURIComponent(svgString)}" style="position: absolute; right: 16px; top: 8px">SVG File</a>

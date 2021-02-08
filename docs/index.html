@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>DXF Explorer</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alice">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Alice&family=Quicksand:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
-      *, *::before, *::after {
+      *, ::before, ::after {
         box-sizing: border-box;
         flex: none;
         overscroll-behavior: contain;
@@ -17,7 +18,9 @@
       }
       html {
         height: 100%;
-        font-family: system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,"メイリオ",sans-serif;
+        font-weight: 300;
+        --font-family: Quicksand,"HiraginoSans-W1","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,"メイリオ",sans-serif;
+        font-family: var(--font-family);
       }
       body {
         height: 100%;
@@ -53,6 +56,7 @@
         color: #222;
         background-color: #eee;
         user-select: none;
+        font-family: system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,"メイリオ",sans-serif;
       }
       nav:not(:empty) {
         padding: .5em 1em;
