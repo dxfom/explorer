@@ -48,7 +48,7 @@ const renderNavigation = (parentElement: HTMLElement) =>
 
 const resolveColorIndex = (index: number | string | undefined) => {
   const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50]
-  return `hsl(${h},${s}%,${l * .8 + 20}%)`
+  return `hsl(${h},${s}%,${Math.round(l * .8 + 20)}%)`
 }
 const resolveFont = (font: DxfFont) => ({ ...font, family: font.family + ',var(--font-family)' })
 
@@ -62,14 +62,14 @@ const renderTabContent = (parentElement: HTMLElement) => {
     case 'PREVIEW': {
       const svgString = createSvgString(state.dxf, { resolveColorIndex, resolveFont, encoding: textDecoder })
       parentElement.innerHTML = `
-        <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%">${svgString}</div>
-        <a target=_blank href="data:image/svg+xml,${encodeURIComponent(svgString)}" style="position: absolute; right: 16px; top: 8px">SVG File</a>
+        <div data-zoom-on-wheel="max-scale: 10000" data-pan-on-drag style="height: 100%; contain: paint; background-color: #123">${svgString}</div>
+        <a download href="data:image/svg+xml,${encodeURIComponent(svgString)}" style="position: absolute; right: 16px; top: 8px; color: cyan">Download SVG File</a>
         <div style="pointer-events: none; position: absolute; right: 16px; bottom: 8px; text-align: right; color: #ddd; text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123"></div>
       `
       const coordinateElement = parentElement.lastElementChild!
       const svg = parentElement.getElementsByTagName('svg')[0]
-      const bbox = svg.getBBox()
-      svg.setAttribute('viewBox', `${bbox.x - 10} ${bbox.y - 10} ${bbox.width + 20} ${bbox.height + 20}`)
+      svg.style.padding = '8px 16px'
+      svg.setAttribute('buffered-rendering', 'static')
       svg.onpointermove = ({ currentTarget, clientX, clientY }) => {
         const svg = currentTarget as SVGSVGElement
         const { x, y } = Object.assign(svg.createSVGPoint(), { x: clientX, y: clientY }).matrixTransform(svg.getScreenCTM()!.inverse())
