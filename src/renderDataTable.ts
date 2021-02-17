@@ -1,9 +1,9 @@
-import 'clusterize.js/clusterize.css'
 import Clusterize from 'clusterize.js'
+import 'clusterize.js/clusterize.css'
 import { escapeHtml } from './escapeHtml'
 
 interface Message {
-  type: "error" | "info" | "warning"
+  type: 'error' | 'info' | 'warning'
   message: string | null
 }
 
@@ -29,7 +29,9 @@ export const renderDataTable = <T, C extends string | number>(
   const scrollBody = parentElement.getElementsByClassName('clusterize-scroll')[0]
   {
     const scrollHead = parentElement.getElementsByClassName('clusterize-header-scroll')[0]
-    scrollBody.addEventListener('scroll', function (this: typeof scrollBody) { scrollHead.scrollLeft = this.scrollLeft })
+    scrollBody.addEventListener('scroll', function (this: typeof scrollBody) {
+      scrollHead.scrollLeft = this.scrollLeft
+    })
   }
 
   const headRow = parentElement.getElementsByTagName('thead')[0].insertRow()
@@ -40,15 +42,14 @@ export const renderDataTable = <T, C extends string | number>(
   const tbody = parentElement.getElementsByTagName('tbody')[0]
 
   const cellContentSelectors = columns.map(column => [cellContentSelector(column), messageSelector?.(column)] as const)
-  const rows = records.map(record =>
-    `<tr>${
-      cellContentSelectors
+  const rows = records.map(
+    record =>
+      `<tr>${cellContentSelectors
         .map(([cell, message]) => {
           const title = message?.(record)?.message
           return `<td${title ? ' title="' + escapeHtml(title) + '"' : ''}>${cell(record) || ''}</td>`
         })
-        .join('')
-    }</tr>`
+        .join('')}</tr>`,
   )
 
   const clusterize = new Clusterize({
@@ -58,7 +59,7 @@ export const renderDataTable = <T, C extends string | number>(
     callbacks: {
       clusterChanged() {
         const bodyRow = tbody.querySelector('tr:not(.clusterize-extra-row)') as HTMLTableRowElement
-        if (bodyRow.classList.contains('clusterize-no-data')) {
+        if (bodyRow?.classList.contains('clusterize-no-data')) {
           return
         }
         for (let i = 0; i < headRow.cells.length; i++) {
@@ -70,7 +71,9 @@ export const renderDataTable = <T, C extends string | number>(
   filterInputElement.placeholder = 'filter'
   filterInputElement.addEventListener('input', function () {
     const filteringText = this.value.toLowerCase()
-    const filteredRows = filteringText ? rows.filter((_, i) => cellContentSelectors.some(([cell]) => cell(records[i])?.toLowerCase().includes(filteringText))) : rows
+    const filteredRows = filteringText
+      ? rows.filter((_, i) => cellContentSelectors.some(([cell]) => cell(records[i])?.toLowerCase().includes(filteringText)))
+      : rows
     clusterize.update(filteredRows)
   })
 }
