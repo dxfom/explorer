@@ -47,8 +47,12 @@
         font-family: Alice, serif;
         font-size: 125%;
       }
+      h2 {
+        font-size: 112.5%;
+      }
       nav {
         flex: none;
+        align-items: center;
         display: flex;
         color: #222;
         background-color: #eee;
@@ -79,19 +83,6 @@
         overflow: hidden;
         font-size: 87.5%;
         position: relative;
-      }
-      main > section {
-        height: 100%;
-        overflow: auto;
-      }
-      main > section > h3:first-child {
-        margin-top: .5em;
-      }
-      main > section > h3 {
-        padding: 0 1em;
-      }
-      main > section > article {
-        margin: 0 1em 2em 1em;
       }
       .dragging-overlay {
         position: fixed;
@@ -148,13 +139,6 @@
         background-color: #fff;
         pointer-events: none;
       }
-      input:not([type]) {
-        pointer-events: all;
-        padding: .25em .5em;
-        border: none;
-        border-bottom: 1px solid #ccc;
-        margin: .5em 0;
-      }
 
       .clusterize {
         max-height: 100%;
@@ -184,7 +168,10 @@
     </style>
   </head>
   <body>
-    <header><h1>DXF Explorer</h1></header>
+    <header>
+      <h2></h2>
+      <h1>DXF Explorer</h1>
+    </header>
     <nav></nav>
     <main></main>
     <div class="dragging-overlay"></div>

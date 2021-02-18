@@ -12,7 +12,7 @@ const production = process.env.NODE_ENV === 'production'
 const watching = process.env.ROLLUP_WATCH
 
 export default {
-  input: 'src/index.ts',
+  input: 'src/index.tsx',
   output: {
     file: `docs/es2019.js`,
     format: 'esm',
