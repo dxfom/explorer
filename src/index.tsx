@@ -1,5 +1,4 @@
 import { parseDxfFileArrayBuffer } from '@dxfom/dxf'
-import { batch } from 'solid-js'
 import { render } from 'solid-js/web'
 import { Content } from './components/Content'
 import { Navigation } from './components/Navigation'
@@ -16,9 +15,8 @@ onDragDrop(document.body, file => {
     const completedAt = performance.now()
     console.debug(file.name, `${completedAt - startedAt} [ms]`)
     document.getElementsByTagName('h2')[0].textContent = file.name
-    batch(() => {
-      setDxf(dxf)
-      setActiveSectionName('PREVIEW')
-    })
+    setActiveSectionName('')
+    setDxf(dxf)
+    setActiveSectionName('PREVIEW')
   })
 })

@@ -41,6 +41,7 @@
     "@dxfom/text": "^0.2.0",
     "clusterize.js": "^0.18.1",
     "solid-js": "^0.24.7",
+    "svg-drag-select": "^0.4.1",
     "svg-pan-zoom-container": "^0.2.7"
   },
   "prettier": {
