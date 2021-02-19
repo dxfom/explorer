@@ -14,7 +14,7 @@ const watching = process.env.ROLLUP_WATCH
 export default {
   input: 'src/index.tsx',
   output: {
-    file: `docs/es2019.js`,
+    file: `docs/app.js`,
     format: 'esm',
     sourcemap: !production,
   },
