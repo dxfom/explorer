@@ -11,27 +11,27 @@
     "start": "rollup -c -w"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.1",
+    "@babel/core": "^7.13.8",
     "@babel/preset-typescript": "^7.13.0",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "@types/clusterize.js": "^0.17.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
-    "babel-preset-solid": "^0.24.2",
-    "eslint": "^7.20.0",
-    "postcss": "^8.2.6",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "babel-preset-solid": "^0.24.13",
+    "eslint": "^7.21.0",
+    "postcss": "^8.2.7",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.39.1",
+    "rollup": "^2.40.0",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-filesize": "^9.1.0",
+    "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-terser": "^7.0.2",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.3"
   },
   "dependencies": {
     "@dxfom/color": "^0.1.1",
@@ -40,9 +40,9 @@
     "@dxfom/svg": "github:dxfom/svg",
     "@dxfom/text": "^0.2.0",
     "clusterize.js": "^0.18.1",
-    "solid-js": "^0.24.7",
+    "solid-js": "^0.24.13",
     "svg-drag-select": "^0.4.1",
-    "svg-pan-zoom-container": "^0.2.7"
+    "svg-pan-zoom-container": "^0.5.0"
   },
   "prettier": {
     "printWidth": 140,

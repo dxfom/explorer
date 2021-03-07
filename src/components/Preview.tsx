@@ -53,7 +53,7 @@ export const Preview = () => {
   return (
     <>
       <div
-        data-zoom-on-wheel="max-scale: 10000"
+        data-zoom-on-wheel="min-scale: 0.9; max-scale: 10000"
         data-pan-on-drag
         style="height: 100%; contain: paint; background-color: #123"
         innerHTML={svgString()}

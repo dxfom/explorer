@@ -9,7 +9,9 @@ const NavigationItem = ({ sectionName }: { sectionName: string }) => (
       hidden
       value={sectionName}
       checked={activeSectionName() === sectionName}
-      onChange={event => event.target.checked && setActiveSectionName(event.target.value as ReturnType<typeof activeSectionName>)}
+      onChange={event =>
+        event.currentTarget.checked && setActiveSectionName(event.currentTarget.value as ReturnType<typeof activeSectionName>)
+      }
     />
     <span>{sectionName}</span>
   </label>
@@ -21,7 +23,7 @@ export const Navigation = () => (
       <input
         placeholder="filter"
         value={filteringText()}
-        onInput={event => setFilteringText(event.target.value)}
+        onInput={event => setFilteringText(event.currentTarget.value)}
         style="border: none; border-bottom: 1px solid #ccc; font-size: 0.875em; padding: .125rem .5rem"
       />
     </Show>
