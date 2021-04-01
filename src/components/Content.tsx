@@ -25,12 +25,12 @@ export const Content = () => (
       <Preview />
     </Match>
     <Match when={activeSectionName() === 'DXF'}>
-      <textarea readonly style="width: 100%; height: 100%; resize: none;">
+      <textarea readonly class="w-full h-full resize-none">
         {createDxfFileString(dxf())}
       </textarea>
     </Match>
     <Match when={activeSectionName() === 'JSON'}>
-      <textarea readonly style="width: 100%; height: 100%; resize: none;">
+      <textarea readonly class="w-full h-full resize-none">
         {JSON.stringify(dxf(), undefined, 2)}
       </textarea>
     </Match>
@@ -78,16 +78,16 @@ export const Content = () => (
       />
     </Match>
     <Match when={activeSectionName() === 'OBJECTS'}>
-      <section style="height: 100%; overflow: auto; padding: .5em 1em;">
+      <section class="h-full overflow-auto mx-1em my-0.5em">
         <For each={dxf().OBJECTS!}>
           {record => [
             <h3>{getGroupCodeValue(record, 0)}</h3>,
-            <table style="margin-bottom: 1em;">
+            <table class="mb-1em">
               <tbody>
                 <For each={record}>
                   {([groupCode, value]) => (
                     <tr>
-                      <td style="text-align: right">{groupCode}</td>
+                      <td class="text-right">{groupCode}</td>
                       <td>{value}</td>
                     </tr>
                   )}
@@ -99,10 +99,10 @@ export const Content = () => (
       </section>
     </Match>
     <Match when={activeSectionName() === 'ACDSDATA'}>
-      <section style="height: 100%; overflow: auto; padding: 1em;">
+      <section class="h-full overflow-auto p-1em">
         <For each={dxf().ACDSDATA!}>
           {records => (
-            <div style="margin-bottom: 1em">
+            <div class="mb-1em">
               <DataTable
                 columns={collectCodes(records)}
                 records={records}

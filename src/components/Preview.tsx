@@ -55,7 +55,8 @@ export const Preview = () => {
       <div
         data-zoom-on-wheel="min-scale: 0.9; max-scale: 10000"
         data-pan-on-drag
-        style="height: 100%; contain: paint; background-color: #123"
+        class="h-full bg-hex-123"
+        style="contain: paint"
         innerHTML={svgString()}
         ref={div =>
           setTimeout(() => {
@@ -96,15 +97,15 @@ export const Preview = () => {
           })
         }
       />
-      <a download href={svgDataUri()} style="position: absolute; right: 16px; top: 8px; color: cyan">
+      <a download href={svgDataUri()} class="absolute right-4 top-2 text-cyan-300">
         Download SVG File
       </a>
       <div
-        class="coordinate"
-        style="pointer-events: none; position: absolute; right: 16px; bottom: 8px; text-align: right; color: #ddd; text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123"
+        class="coordinate pointer-events-none absolute right-16px bottom-8px text-right text-hex-ddd"
+        style="text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123"
       ></div>
       <Show when={selectedEntities().length !== 0}>
-        <div style="position: absolute; right: 0; top: 0; bottom: 0; overflow: auto; background: white;">
+        <div class="absolute top-0 bottom-0 right-0 overflow-auto bg-white">
           <table>
             <tbody>
               <For each={selectedEntities()}>
@@ -117,7 +118,7 @@ export const Preview = () => {
                   <For each={entity!}>
                     {([groupCode, value]) => (
                       <tr>
-                        <td style="text-align: right">{groupCode}</td>
+                        <td class="text-right">{groupCode}</td>
                         <td>{value}</td>
                       </tr>
                     )}

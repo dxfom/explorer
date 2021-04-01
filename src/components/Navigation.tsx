@@ -27,7 +27,7 @@ export const Navigation = () => (
         style="border: none; border-bottom: 1px solid #ccc; font-size: 0.875em; padding: .125rem .5rem"
       />
     </Show>
-    <div style="flex: auto" />
+    <div class="flex-auto" />
     <NavigationItem sectionName="PREVIEW" />
     <NavigationItem sectionName="DXF" />
     <NavigationItem sectionName="JSON" />
