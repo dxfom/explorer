@@ -5,30 +5,27 @@
   "license": "GPL-3.0",
   "scripts": {
     "clean": "rimraf docs/ && mkdir docs",
-    "build": "npm-run-all clean -p build:* lint",
-    "build:js": "node build.mjs",
-    "build:css": "windicss 'src/**/*.(html|ts|tsx)' -m -o docs/utilities.css",
     "lint": "tsc -p . && eslint --ext .ts src",
-    "start": "npm-run-all clean -p watch:*",
-    "watch:js": "node build.mjs --serve",
-    "watch:css": "sane 'npm run build:css' src --glob=**/*.tsx"
+    "build": "npm run clean && node build.mjs && npm run lint",
+    "start": "npm run clean && node build.mjs --serve"
   },
   "devDependencies": {
     "@babel/core": "^7.13.14",
     "@babel/preset-typescript": "^7.13.0",
+    "@luncheon/esbuild-plugin-windicss": "^0.2.0",
     "@types/clusterize.js": "^0.17.1",
     "@typescript-eslint/eslint-plugin": "^4.20.0",
     "@typescript-eslint/parser": "^4.20.0",
     "babel-preset-solid": "^0.25.0",
-    "esbuild": "^0.11.2",
+    "esbuild": "^0.11.3",
     "esbuild-plugin-babel": "^0.2.3",
+    "esbuild-plugin-pipe": "^0.2.0",
     "eslint": "^7.23.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "sane": "^4.1.0",
-    "typescript": "^4.2.3",
-    "windicss": "^2.5.9"
+    "typescript": "^4.2.3"
   },
   "dependencies": {
     "@dxfom/color": "^0.1.1",
