@@ -24,7 +24,7 @@ export const Navigation = () => (
         placeholder="filter"
         value={filteringText()}
         onInput={event => setFilteringText(event.currentTarget.value)}
-        style="border: none; border-bottom: 1px solid #ccc; font-size: 0.875em; padding: .125rem .5rem"
+        class="border-b border-hex-ccc text-sm leading-none px-2 py-0.5"
       />
     </Show>
     <div class="flex-auto" />
