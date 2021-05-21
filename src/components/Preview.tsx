@@ -38,7 +38,7 @@ export const Preview = () => {
     }),
   )
   const svgDataUri = createMemo(() => 'data:image/svg+xml,' + encodeURIComponent(svgString()))
-  const [selectedHandles, setSelectedHandles] = createSignal<string[]>([])
+  const [selectedHandles, setSelectedHandles] = createSignal<readonly string[]>([])
   const selectedEntities = createMemo(() =>
     selectedHandles()
       .map(handle => findEntityByHandle(dxf(), handle))
@@ -56,20 +56,16 @@ export const Preview = () => {
         data-zoom-on-wheel="min-scale: 0.9; max-scale: 10000"
         data-pan-on-drag
         class="h-full bg-hex-123"
-        style="contain: paint"
         innerHTML={svgString()}
         ref={div =>
           setTimeout(() => {
             const coordinateElement = div.parentElement!.getElementsByClassName('coordinate')[0]
             const svg = div.getElementsByTagName('svg')[0]
             svg.style.padding = '8px 16px'
-            svg.setAttribute('buffered-rendering', 'static')
+            svg.setAttribute('shape-rendering', 'optimizeSpeed')
+            svg.setAttribute('text-rendering', 'optimizeSpeed')
             svg.onpointermove = ({ currentTarget, clientX, clientY }) => {
-              const svg = currentTarget as SVGSVGElement
-              const { x, y } = Object.assign(svg.createSVGPoint(), {
-                x: clientX,
-                y: clientY,
-              }).matrixTransform(svg.getScreenCTM()!.inverse())
+              const { x, y } = new DOMPoint(clientX, clientY).matrixTransform((currentTarget as SVGSVGElement).getScreenCTM()!.inverse())
               coordinateElement.textContent = `${Math.round(x)}, ${Math.round(-y)}`
             }
             svg.onpointerleave = () => (coordinateElement.textContent = '')
