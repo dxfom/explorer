@@ -34,6 +34,7 @@ export const Preview = () => {
         return `hsl(${h},${s}%,${Math.round(l * 0.8 + 20)}%)`
       },
       resolveFont: font => ({ ...font, family: font.family + ',var(--font-family)' }),
+      addAttributes: entity => ({ 'data-5': getGroupCodeValue(entity, 5) }),
       encoding: textDecoder,
     }),
   )
