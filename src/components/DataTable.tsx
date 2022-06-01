@@ -42,7 +42,7 @@ export const DataTable: <C extends string | number, T>(options: ClusterizedTable
       return
     }
     clusterize = new Clusterize({
-      scrollElem: element.getElementsByClassName('clusterize-scroll')[0],
+      scrollElem: element.getElementsByClassName('clusterize-scroll')[0] as HTMLElement,
       contentElem: tbody,
       rows: filteredRows(),
       callbacks: {
@@ -56,7 +56,7 @@ export const DataTable: <C extends string | number, T>(options: ClusterizedTable
           }
         },
       },
-    } as any)
+    })
   })
   return (
     <div ref={element} class="clusterize">

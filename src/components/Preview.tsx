@@ -113,7 +113,7 @@ export const Preview = () => {
                       {i() === 0 ? `${selectedEntities().length} ${selectedEntities().length === 1 ? 'entity' : 'entities'}` : ` `}
                     </th>
                   </tr>,
-                  <For each={entity!}>
+                  <For each={entity}>
                     {([groupCode, value]) => (
                       <tr>
                         <td class="text-right">{groupCode}</td>

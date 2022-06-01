@@ -78,8 +78,8 @@ export const Content = () => (
       />
     </Match>
     <Match when={activeSectionName() === 'OBJECTS'}>
-      <section class="h-full overflow-auto mx-1em my-0.5em">
-        <For each={dxf().OBJECTS!}>
+      <section class="h-full overflow-auto px-1em py-0.5em">
+        <For each={dxf().OBJECTS}>
           {record => [
             <h3>{getGroupCodeValue(record, 0)}</h3>,
             <table class="mb-1em">
@@ -100,7 +100,7 @@ export const Content = () => (
     </Match>
     <Match when={activeSectionName() === 'ACDSDATA'}>
       <section class="h-full overflow-auto p-1em">
-        <For each={dxf().ACDSDATA!}>
+        <For each={dxf().ACDSDATA}>
           {records => (
             <div class="mb-1em">
               <DataTable
