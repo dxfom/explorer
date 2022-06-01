@@ -1,4 +1,4 @@
-export const onDragDrop = (element: HTMLElement, listener: (file: File) => unknown) => {
+export const onDropFile = (element: HTMLElement, listener: (file: File) => unknown) => {
   let dragEnter = false
 
   element.addEventListener('dragenter', () => {
@@ -12,7 +12,7 @@ export const onDragDrop = (element: HTMLElement, listener: (file: File) => unkno
     const dataTransfer = event.dataTransfer
     if (dataTransfer) {
       if (
-        (dataTransfer.types.length === 1 && dataTransfer.types[0] === 'Files') || 
+        (dataTransfer.types.length === 1 && dataTransfer.types[0] === 'Files') ||
         (dataTransfer.items && dataTransfer.items.length === 1 && dataTransfer.items[0].kind === 'file')
       ) {
         dataTransfer.dropEffect = 'copy'

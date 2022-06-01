@@ -7,6 +7,7 @@ import fs from 'fs'
 fs.mkdirSync('docs', { recursive: true })
 fs.copyFileSync('src/index.html', 'docs/index.html')
 fs.copyFileSync('src/favicon.png', 'docs/favicon.png')
+fs.copyFileSync('src/site.webmanifest', 'docs/site.webmanifest')
 
 const windiCss = windiCssPlugin({ filter: /^$/, windiCssConfig: { prefixer: false } })
 
