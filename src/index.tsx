@@ -34,12 +34,14 @@ interface LaunchParams {
   readonly files: readonly (FileSystemFileHandle | FileSystemDirectoryHandle)[]
 }
 
-declare const launchQueue: LaunchQueue
-
-if (typeof launchQueue !== 'undefined') {
-  launchQueue.setConsumer(async ({ files }) => {
-    if (files.length === 1 && files[0].kind === 'file') {
-      handleFile(await files[0].getFile())
-    }
-  })
+declare global {
+  interface Window {
+    readonly launchQueue?: LaunchQueue | undefined
+  }
 }
+
+window.launchQueue?.setConsumer(async ({ files }) => {
+  if (files.length === 1 && files[0].kind === 'file') {
+    handleFile(await files[0].getFile())
+  }
+})
