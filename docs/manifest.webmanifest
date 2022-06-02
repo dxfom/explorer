@@ -1,7 +1,5 @@
 {
-  "manifest_version": 3,
   "name": "DXF Explorer",
-  "version": "0.0.0",
   "theme_color": "#3ab",
   "icons": [
     {
@@ -23,7 +21,7 @@
           "type": "image/png"
         }
       ],
-      "launch_type": "single-client"
+      "launch_type": "multiple-clients"
     }
   ]
 }
