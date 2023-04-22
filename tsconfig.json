@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "target": "es2020",
-    "module": "es2020",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "isolatedModules": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
@@ -12,15 +11,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "newLine": "LF",
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*"]
 }
