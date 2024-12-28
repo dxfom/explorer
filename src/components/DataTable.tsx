@@ -71,7 +71,7 @@ export const DataTable: <C extends string | number, T>(options: ClusterizedTable
       </div>
       <div class="clusterize-scroll" onScroll={event => scrollHead && (scrollHead.scrollLeft = event.currentTarget.scrollLeft)}>
         <table>
-          <tbody class="clusterize-content"></tbody>
+          <tbody class="clusterize-content" />
         </table>
       </div>
     </div>

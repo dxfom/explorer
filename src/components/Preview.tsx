@@ -101,7 +101,7 @@ export const Preview = () => {
       <div
         class="coordinate pointer-events-none absolute right-16px bottom-8px text-right text-hex-ddd"
         style="text-shadow: 0 1px #123,0 -1px #123,1px 0 #123,-1px 0 #123,0 0 4px #123"
-      ></div>
+      />
       <Show when={selectedEntities().length !== 0}>
         <div class="absolute top-0 bottom-0 right-0 overflow-auto bg-white">
           <table>
@@ -110,7 +110,7 @@ export const Preview = () => {
                 {(entity, i) => [
                   <tr>
                     <th colSpan="2">
-                      {i() === 0 ? `${selectedEntities().length} ${selectedEntities().length === 1 ? 'entity' : 'entities'}` : ` `}
+                      {i() === 0 ? `${selectedEntities().length} ${selectedEntities().length === 1 ? 'entity' : 'entities'}` : ' '}
                     </th>
                   </tr>,
                   <For each={entity}>

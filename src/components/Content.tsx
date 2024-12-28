@@ -19,6 +19,7 @@ const collectCodes = (records: readonly DxfRecordReadonly[]) => {
 export const Content = () => (
   <Switch>
     <Match when={!activeSectionName()}>
+      {/* biome-ignore lint/complexity/noUselessFragments: */}
       <></>
     </Match>
     <Match when={activeSectionName() === 'PREVIEW'}>

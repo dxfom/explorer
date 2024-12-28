@@ -6,24 +6,21 @@
   "type": "module",
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('docs',{force:true,recursive:true})\" && mkdir docs",
-    "lint": "tsc -p . && eslint --ext .ts src",
-    "build": "npm run clean && node build.js && npm run lint",
+    "check": "tsc -p . && biome lint",
+    "build": "npm run clean && node build.js && npm run check",
     "start": "npm run clean && node build.js --serve"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
+    "@biomejs/biome": "^1.9.4",
     "@luncheon/esbuild-plugin-windicss": "^0.3.0",
     "@types/clusterize.js": "^0.18.3",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
     "babel-preset-solid": "^1.9.3",
     "esbuild": "^0.24.2",
     "esbuild-plugin-babel": "^0.2.3",
     "esbuild-plugin-pipe": "^0.2.0",
-    "eslint": "^8.57.1",
-    "prettier": "^2.8.8",
-    "typescript": "^5.0.4"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@dxfom/color": "^0.2.0",
