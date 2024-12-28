@@ -1,57 +1,57 @@
-import { DXF_COLOR_HSL } from '@dxfom/color/hsl'
-import { DxfReadonly, getGroupCodeValue } from '@dxfom/dxf'
-import { createSvgString } from '@dxfom/svg'
-import { createEffect, createMemo, createSignal, For, Show } from 'solid-js'
-import svgDragSelect from 'svg-drag-select'
-import 'svg-pan-zoom-container'
-import { dxf } from '../state'
+import { DXF_COLOR_HSL } from "@dxfom/color/hsl";
+import { type DxfReadonly, getGroupCodeValue } from "@dxfom/dxf";
+import { createSvgString } from "@dxfom/svg";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import svgDragSelect from "svg-drag-select";
+import "svg-pan-zoom-container";
+import { dxf } from "../state";
 
-const textDecoder = new TextDecoder('ms932')
-const styleElement = document.head.appendChild(document.createElement('style'))
+const textDecoder = new TextDecoder("ms932");
+const styleElement = document.head.appendChild(document.createElement("style"));
 
 const findEntityByHandle = (dxf: DxfReadonly, handle: string) => {
   {
-    const entity = dxf.ENTITIES?.find(entity => getGroupCodeValue(entity, 5) === handle)
+    const entity = dxf.ENTITIES?.find(entity => getGroupCodeValue(entity, 5) === handle);
     if (entity) {
-      return entity
+      return entity;
     }
   }
   if (dxf.BLOCKS) {
     for (const block of Object.values(dxf.BLOCKS)) {
-      const entity = block.find(entity => getGroupCodeValue(entity, 5) === handle)
+      const entity = block.find(entity => getGroupCodeValue(entity, 5) === handle);
       if (entity) {
-        return entity
+        return entity;
       }
     }
   }
-}
+};
 
 export const Preview = () => {
   const svgString = createMemo(() =>
     createSvgString(dxf(), {
       resolveColorIndex: index => {
-        const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50]
-        return `hsl(${h},${s}%,${Math.round(l * 0.8 + 20)}%)`
+        const [h, s, l] = DXF_COLOR_HSL[index as number & string] ?? [0, 0, 50];
+        return `hsl(${h},${s}%,${Math.round(l * 0.8 + 20)}%)`;
       },
       resolveLineWeight: lineWeight => (lineWeight === -3 ? 0.1 : lineWeight),
-      resolveFont: font => ({ ...font, family: font.family + ',var(--font-family)' }),
-      addAttributes: entity => ({ 'data-5': getGroupCodeValue(entity, 5) }),
+      resolveFont: font => ({ ...font, family: font.family + ",var(--font-family)" }),
+      addAttributes: entity => ({ "data-5": getGroupCodeValue(entity, 5) }),
       encoding: textDecoder,
     }),
-  )
-  const svgDataUri = createMemo(() => 'data:image/svg+xml,' + encodeURIComponent(svgString()))
-  const [selectedHandles, setSelectedHandles] = createSignal<readonly string[]>([])
+  );
+  const svgDataUri = createMemo(() => "data:image/svg+xml," + encodeURIComponent(svgString()));
+  const [selectedHandles, setSelectedHandles] = createSignal<readonly string[]>([]);
   const selectedEntities = createMemo(() =>
     selectedHandles()
       .map(handle => findEntityByHandle(dxf(), handle))
       .filter(Boolean),
-  )
+  );
   createEffect(() => {
     styleElement.textContent =
       selectedHandles()
         .map(handle => `[data-5="${handle}"]`)
-        .join(',') + '{stroke-width:3px}'
-  })
+        .join(",") + "{stroke-width:3px}";
+  });
   return (
     <>
       <div
@@ -61,37 +61,37 @@ export const Preview = () => {
         innerHTML={svgString()}
         ref={div =>
           setTimeout(() => {
-            const coordinateElement = div.parentElement!.getElementsByClassName('coordinate')[0]
-            const svg = div.getElementsByTagName('svg')[0]
-            svg.style.padding = '8px 16px'
-            svg.setAttribute('shape-rendering', 'optimizeSpeed')
-            svg.setAttribute('text-rendering', 'optimizeSpeed')
+            const coordinateElement = div.parentElement!.getElementsByClassName("coordinate")[0];
+            const svg = div.getElementsByTagName("svg")[0];
+            svg.style.padding = "8px 16px";
+            svg.setAttribute("shape-rendering", "optimizeSpeed");
+            svg.setAttribute("text-rendering", "optimizeSpeed");
             svg.onpointermove = ({ currentTarget, clientX, clientY }) => {
-              const { x, y } = new DOMPoint(clientX, clientY).matrixTransform((currentTarget as SVGSVGElement).getScreenCTM()!.inverse())
-              coordinateElement.textContent = `${Math.round(x)}, ${Math.round(-y)}`
-            }
-            svg.onpointerleave = () => (coordinateElement.textContent = '')
-            svg.oncontextmenu = event => event.preventDefault()
+              const { x, y } = new DOMPoint(clientX, clientY).matrixTransform((currentTarget as SVGSVGElement).getScreenCTM()!.inverse());
+              coordinateElement.textContent = `${Math.round(x)}, ${Math.round(-y)}`;
+            };
+            svg.onpointerleave = () => (coordinateElement.textContent = "");
+            svg.oncontextmenu = event => event.preventDefault();
 
             svgDragSelect({
               svg,
-              selector: 'intersection',
+              selector: "intersection",
               onSelectionStart: ({ pointerEvent, cancel }) => {
                 if (pointerEvent.button === 2) {
-                  setSelectedHandles([])
+                  setSelectedHandles([]);
                 } else {
-                  cancel()
+                  cancel();
                 }
               },
               onSelectionChange: ({ selectedElements }) => {
-                const selectedSet = new Set<string>()
+                const selectedSet = new Set<string>();
                 for (const element of selectedElements) {
-                  const handle = element.closest('[data-5]')?.getAttribute('data-5')
-                  handle && selectedSet.add(handle)
+                  const handle = element.closest("[data-5]")?.getAttribute("data-5");
+                  handle && selectedSet.add(handle);
                 }
-                setSelectedHandles([...selectedSet])
+                setSelectedHandles([...selectedSet]);
               },
-            })
+            });
           })
         }
       />
@@ -110,7 +110,7 @@ export const Preview = () => {
                 {(entity, i) => [
                   <tr>
                     <th colSpan="2">
-                      {i() === 0 ? `${selectedEntities().length} ${selectedEntities().length === 1 ? 'entity' : 'entities'}` : ' '}
+                      {i() === 0 ? `${selectedEntities().length} ${selectedEntities().length === 1 ? "entity" : "entities"}` : " "}
                     </th>
                   </tr>,
                   <For each={entity}>
@@ -128,5 +128,5 @@ export const Preview = () => {
         </div>
       </Show>
     </>
-  )
-}
+  );
+};

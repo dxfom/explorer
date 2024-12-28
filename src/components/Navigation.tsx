@@ -1,5 +1,5 @@
-import { For, Show } from 'solid-js'
-import { activeSectionName, dxf, filteringText, setActiveSectionName, setFilteringText } from '../state'
+import { For, Show } from "solid-js";
+import { activeSectionName, dxf, filteringText, setActiveSectionName, setFilteringText } from "../state";
 
 const NavigationItem = ({ sectionName }: { sectionName: string }) => (
   <label>
@@ -15,11 +15,11 @@ const NavigationItem = ({ sectionName }: { sectionName: string }) => (
     />
     <span>{sectionName}</span>
   </label>
-)
+);
 
 export const Navigation = () => (
   <Show when={activeSectionName()}>
-    <Show when={['HEADER', 'CLASSES', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(activeSectionName())}>
+    <Show when={["HEADER", "CLASSES", "TABLES", "BLOCKS", "ENTITIES"].includes(activeSectionName())}>
       <input
         placeholder="filter"
         value={filteringText()}
@@ -33,4 +33,4 @@ export const Navigation = () => (
     <NavigationItem sectionName="JSON" />
     <For each={Object.keys(dxf())}>{sectionName => <NavigationItem sectionName={sectionName} />}</For>
   </Show>
-)
+);
